@@ -1,0 +1,314 @@
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug "andreyorst/plug.kak" noload
+
+# Base editor config
+add-highlighter global/ number-lines
+hook global WinCreate ^[^*]+$ %{
+    editorconfig-load
+}
+set global ui_options ncurses_assistant=none
+set global ui_options ncurses_status_on_top=yes
+
+# My attempt at building an "IDE" session, i.e. a multi-client kakoune session with different
+# client windows for different purposes
+# TODO: Configure this a bit better before use
+def ide %{
+    rename-client main
+    set global jumpclient main
+
+    new rename-client tools
+    set global toolsclient tools
+
+    new rename-client docs
+    set global docsclient docs
+}
+
+# Various letter case transformations
+plug "https://gitlab.com/FlyingWombat/case.kak" %{
+    map global normal <a-c> ': enter-user-mode case<ret>'
+}
+
+# Tabs
+plug "andreyorst/smarttab.kak"
+
+# Edit directory
+plug "TeddyDD/kakoune-edit-or-dir" %{
+    unalias global e edit
+    alias global e edit-or-dir
+}
+
+# FZF
+plug "andreyorst/fzf.kak" %{
+    map global normal <c-p> ': fzf-mode<ret>'
+}
+
+# Various coding binds
+map global user ? ': comment-block<ret>' -docstring 'comment block'
+map global user / ': comment-line<ret>' -docstring 'comment line'
+map global user a '*%s<ret>' -docstring 'select all'  # TODO: Fix this
+
+# Clipboard integration
+plug "lePerdu/kakboard" %{
+    hook global WinCreate .* %{ kakboard-enable }
+}
+
+# # X clipboard binds
+# map global user p '<a-!>xsel --output --clipboard<ret>' -docstring 'paste X clipboard (after)'
+# map global user P '!xsel --output --clipboard<ret>' -docstring 'paste X clipboard (insert)'
+#
+# # Clipboard hooks for X
+# hook global NormalKey y|d|c %{ nop %sh{
+#     printf %s "$kak_main_reg_dquote" | xsel --input --clipboard
+# # }}
+
+plug "Delapouite/kakoune-palette" %{
+    map global user c ': palette-status<ret>' -docstring 'show palette'
+}
+
+def suspend-and-resume \
+    -params 1..2 \
+    -docstring 'suspend-and-resume <cli command> [<kak command after resume>]: backgrounds current kakoune client and runs specified cli command.  Upon exit of command the optional kak command is executed.' \
+    %{ evaluate-commands %sh{
+
+    # Note we are adding '&& fg' which resumes the kakoune client process after the cli command exits
+    cli_cmd="$1 && fg"
+    post_resume_cmd="$2"
+
+    # automation is different platform to platform
+    platform=$(uname -s)
+    case $platform in
+        Darwin)
+            automate_cmd="sleep 0.01; osascript -e 'tell application \"System Events\" to keystroke \"$cli_cmd\" & return '"
+            kill_cmd="/bin/kill"
+            break
+            ;;
+        Linux)
+            automate_cmd="sleep 0.2; xdotool type '$cli_cmd'; xdotool key Return"
+            kill_cmd="/usr/bin/kill"
+            break
+            ;;
+    esac
+
+    # Uses platforms automation to schedule the typing of our cli command
+    nohup sh -c "$automate_cmd"  > /dev/null 2>&1 &
+    # Send kakoune client to the background
+    $kill_cmd -SIGTSTP $kak_client_pid
+
+    # ...At this point the kakoune client is paused until the " && fg " gets run in the $automate_cmd
+
+    # Upon resume, run the kak command is specified
+    if [ ! -z "$post_resume_cmd" ]; then
+        echo "$post_resume_cmd"
+    fi
+}}
+
+def tig-blame -override -docstring 'Open blame in tig for current file and line' %{
+    # Note here we aren't passing any command on resume of kakoune
+    suspend-and-resume "tig blame +%val{cursor_line} %val{buffile}"
+}
+
+declare-user-mode tig
+map global tig b ': tig-blame<ret>' -docstring 'show blame (with tig)'
+map global tig s ': suspend-and-resume "tig status"<ret>' -docstring 'show git status (with tig)'
+map global tig m ': suspend-and-resume "tig"<ret>' -docstring 'show main view (with tig)'
+map global user t ': enter-user-mode tig<ret>' -docstring 'tig commands'
+
+# Color schemes
+# colorscheme nord
+colorscheme gruvbox-dark
+unset-face global Default
+unset-face global StatusLine
+unset-face global BufferPadding
+
+# Buffer nav
+# plug "Delapouite/kakoune-buffers" %{
+#     map global normal ^ q
+#     map global normal <a-^> Q
+#     map global normal q b
+#     map global normal Q B
+#     map global normal <a-q> <a-b>
+#     map global normal <a-Q> <a-B>
+#     map global normal b ': enter-buffers-mode<ret>' -docstring 'buffers'
+#     map global normal B ': enter-user-mode -lock buffers<ret>' -docstring 'buffers (lock)'
+# }
+
+# Highlight trailing whitespace
+add-highlighter global/show-trailing-whitespaces regex '\h+$' 0:Error
+
+# Highlight search results
+set-face global search +bi
+
+# Alacritty integration
+# plug "alexherbo2/alacritty.kak" %{
+#   require-module alacritty
+#    hook global ModuleLoaded x11 %{
+#      alias global terminal alacritty-terminal
+#      alias global popup alacritty-terminal-popup
+#    }
+# }
+
+# TODO: Should I try this again?
+# Crosshairs
+# plug "insipx/kak-crosshairs" %{
+#     crosshairs
+# }
+
+# Powerline
+plug "jdugan6240/powerline.kak" defer powerline %{
+    set-option global powerline_format 'git bufname filetype mode_info line_column position'
+    # powerline-theme nord
+} config %{
+    powerline-start
+}
+
+# Completion navigation
+hook global InsertCompletionShow .* %{
+    try %{
+        # this command temporarily removes cursors preceded by whitespace;
+        # if there are no cursors left, it raises an error, does not
+        # continue to execute the mapping commands, and the error is eaten
+        # by the `try` command so no warning appears.
+        execute-keys -draft 'h<a-K>\h<ret>'
+        map window insert <tab> <c-n>
+        map window insert <s-tab> <c-p>
+        hook -once -always window InsertCompletionHide .* %{
+            map window insert <tab> <tab>
+            map window insert <s-tab> <s-tab>
+        }
+    }
+}
+
+# Highlighting wrap gutter
+hook global WinSetOption .* %{
+    set global autowrap_column 100
+    # autowrap-enable
+}
+add-highlighter global/ column '%opt{autowrap_column}' default,red
+
+# TODO: I forgot what this does...
+declare-option str buffile ''
+hook global BufNewFile .* %{ set-option buffer buffile %sh{ echo ${kak_buffile} } }
+hook global BufOpenFile .* %{ set-option buffer buffile %sh{ echo ${kak_buffile} } }
+
+# LSP
+plug "kak-lsp/kak-lsp" do %{
+    cargo build --release --locked
+    cargo install --force --path .
+} config %{
+
+    # uncomment to enable debugging
+    # eval %sh{echo ${kak_opt_lsp_cmd} >> /tmp/kak-lsp.log}
+    # set global lsp_cmd "kak-lsp -s %val{session} -vvv --log /tmp/kak-lsp.log"
+
+    # this is not necessary; the `lsp-enable-window` will take care of it
+    # eval %sh{${kak_opt_lsp_cmd} --kakoune -s $kak_session}
+
+    set global lsp_diagnostic_line_error_sign '║'
+    set global lsp_diagnostic_line_warning_sign '┊'
+    set global lsp_hover_max_lines 20
+
+    map global user l %{:enter-user-mode lsp<ret>} -docstring "LSP mode"
+    map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
+    map global object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+    map global object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+    map global object e '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
+    map global object k '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
+    map global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
+    map global object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
+
+    define-command ne -docstring 'go to next error/warning from lsp' %{ lsp-find-error --include-warnings }
+    define-command pe -docstring 'go to previous error/warning from lsp' %{ lsp-find-error --previous --include-warnings }
+    define-command ee -docstring 'go to current error/warning from lsp' %{ lsp-find-error --include-warnings; lsp-find-error --previous --include-warnings }
+    define-command lsp-restart -docstring 'restart lsp server' %{ lsp-stop; lsp-start }
+    declare-option -hidden str modeline_progress ""
+    define-command -hidden -params 4 -override lsp-handle-progress %{
+        set global modeline_progress %sh{
+            echo $1${2:+": $2"}${3:+" $3%"}${4:+" ✓"}
+        }
+    }
+
+    hook global WinSetOption filetype=(rust|ruby|python|go|javascript|typescript|c|cpp|html|css|scss|vue|graphql) %{
+        map window normal <c-r> ': lsp-rename-prompt<ret>'
+        # set-option window lsp_auto_highlight_references true
+        set-option window lsp_hover_anchor true
+        set-option global lsp_show_hover_format 'printf %s "${lsp_info}"'
+        map window normal <\> ': lsp-hover<ret>'
+        echo -debug "Enabling LSP for filtetype %opt{filetype}"
+        lsp-enable-window
+    }
+
+    hook global KakEnd .* lsp-exit
+}
+
+###
+# A bunch of filetype/format binds for various languages
+###
+
+# Vue support
+plug "ABuffSeagull/kakoune-vue"
+
+# Typescript support
+# Currently this is broken: https://github.com/atomrc/kakoune-typescript/issues/3
+# plug "atomrc/kakoune-typescript"
+
+hook global BufCreate .*\.yuck %{
+        set-option buffer filetype clojure
+}
+
+hook global BufCreate .*\.graphql %{
+    set-option buffer filetype graphql
+}
+
+hook global BufCreate .*\.jsonnet %{
+    set-option buffer filetype jsonnet
+}
+
+hook global BufCreate .*\.libsonnet %{
+    set-option buffer filetype jsonnet
+}
+
+hook global WinSetOption filetype=(c|cpp) %{
+    clang-enable-autocomplete
+}
+hook global WinSetOption filetype=ruby %{
+    set window formatcmd 'rufo -x'
+    hook window BufWritePre .* format
+}
+hook global WinSetOption filetype=(hbs|handlebars) %{
+    set window formatcmd "npx prettier --parser glimmer --stdin-filepath=%opt{buffile}"
+    hook window BufWritePre .* format
+}
+hook global WinSetOption filetype=(typescript|javascript|vue) %{
+    set window formatcmd "npx prettier --stdin-filepath=%opt{buffile}"
+    hook window BufWritePre .* format
+}
+# TODO: Put me back in coach!
+# hook global WinSetOption filetype=(markdown|json|html|graphql|css|sass|scss|yaml) %{
+#     set window formatcmd "npx prettier --stdin-filepath=%opt{buffile}"
+#     hook window BufWritePre .* format
+# }
+hook global WinSetOption filetype=(xml) %{
+    set window formatcmd "npx prettier --parser html --stdin-filepath=%opt{buffile}"
+    hook window BufWritePre .* format
+}
+hook global WinSetOption filetype=javascript %{
+    set window lintcmd 'npx eslint'
+}
+hook global WinSetOption filetype=python %{
+    set window formatcmd "black -"
+    hook window BufWritePre .* format
+    # TODO: WTF changed????
+    # set-option global lsp_server_configuration pyls.configurationSources=["flake8"]
+    # hook window BufWritePre .* lsp-formatting-sync
+}
+hook global WinSetOption filetype=go %{
+    set window lintcmd 'golint'
+    set window formatcmd 'gofmt'
+    hook window BufWritePre .* format
+}
+hook global WinSetOption filetype=rust %{
+    set window lsp_server_configuration rust.clippy_preference="on"
+    set window formatcmd 'rustfmt'
+    # hook window BufWritePre .* lsp-formatting-sync
+    hook window BufWritePre .* format
+}
