@@ -47,19 +47,18 @@ map global user ? ': comment-block<ret>' -docstring 'comment block'
 map global user / ': comment-line<ret>' -docstring 'comment line'
 map global user a '*%s<ret>' -docstring 'select all'  # TODO: Fix this
 
-# Clipboard integration
 plug "lePerdu/kakboard" %{
     hook global WinCreate .* %{ kakboard-enable }
 }
 
-# # X clipboard binds
+# X clipboard binds
 # map global user p '<a-!>xsel --output --clipboard<ret>' -docstring 'paste X clipboard (after)'
 # map global user P '!xsel --output --clipboard<ret>' -docstring 'paste X clipboard (insert)'
-#
-# # Clipboard hooks for X
+
+# Clipboard hooks for X
 # hook global NormalKey y|d|c %{ nop %sh{
 #     printf %s "$kak_main_reg_dquote" | xsel --input --clipboard
-# # }}
+# }}
 
 plug "Delapouite/kakoune-palette" %{
     map global user c ': palette-status<ret>' -docstring 'show palette'
@@ -251,8 +250,13 @@ plug "ABuffSeagull/kakoune-vue"
 # Currently this is broken: https://github.com/atomrc/kakoune-typescript/issues/3
 # plug "atomrc/kakoune-typescript"
 
+# Meh
+hook global BufCreate .*\.hcl %{
+    set-option buffer filetype terraform
+}
+
 hook global BufCreate .*\.yuck %{
-        set-option buffer filetype clojure
+    set-option buffer filetype clojure
 }
 
 hook global BufCreate .*\.graphql %{
@@ -275,24 +279,23 @@ hook global WinSetOption filetype=ruby %{
     hook window BufWritePre .* format
 }
 hook global WinSetOption filetype=(hbs|handlebars) %{
-    set window formatcmd "npx prettier --parser glimmer --stdin-filepath=%opt{buffile}"
+    set window formatcmd "npx --offline prettier --parser glimmer --stdin-filepath=%opt{buffile}"
     hook window BufWritePre .* format
 }
 hook global WinSetOption filetype=(typescript|javascript|vue) %{
-    set window formatcmd "npx prettier --stdin-filepath=%opt{buffile}"
+    set window formatcmd "npx --offline prettier --stdin-filepath=%opt{buffile}"
     hook window BufWritePre .* format
 }
-# TODO: Put me back in coach!
-# hook global WinSetOption filetype=(markdown|json|html|graphql|css|sass|scss|yaml) %{
-#     set window formatcmd "npx prettier --stdin-filepath=%opt{buffile}"
-#     hook window BufWritePre .* format
-# }
+hook global WinSetOption filetype=(json|html|graphql|css|sass|scss|yaml) %{
+    set window formatcmd "npx --offline prettier --stdin-filepath=%opt{buffile}"
+    hook window BufWritePre .* format
+}
 hook global WinSetOption filetype=(xml) %{
-    set window formatcmd "npx prettier --parser html --stdin-filepath=%opt{buffile}"
+    set window formatcmd "npx --offline prettier --parser html --stdin-filepath=%opt{buffile}"
     hook window BufWritePre .* format
 }
 hook global WinSetOption filetype=javascript %{
-    set window lintcmd 'npx eslint'
+    set window lintcmd 'npx --offline eslint'
 }
 hook global WinSetOption filetype=python %{
     set window formatcmd "black -"
@@ -307,7 +310,7 @@ hook global WinSetOption filetype=go %{
     hook window BufWritePre .* format
 }
 hook global WinSetOption filetype=rust %{
-    set window lsp_server_configuration rust.clippy_preference="on"
+    # set window lsp_server_configuration rust.clippy_preference="on"
     set window formatcmd 'rustfmt'
     # hook window BufWritePre .* lsp-formatting-sync
     hook window BufWritePre .* format
