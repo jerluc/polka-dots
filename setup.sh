@@ -7,9 +7,14 @@ polka_dir=$(dirname $(realpath $0))
 maybe_setup_link () {
     src=$1
     dst=$2
-    if [ ! -h "$dst" ]; then
-        ln -s $src $dst
-        echo "Created symlink: $dst"
+
+    if [[ ! -h "$dst" ]]; then
+        if [[ -e "$dst" ]]; then
+            echo "Cowardly refusing to update path: $dst"
+        else
+            ln -s $src $dst
+            echo "Created symlink: $dst"
+        fi
     fi
 }
 
