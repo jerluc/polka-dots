@@ -1,5 +1,5 @@
-snippet_support = false
-verbosity = 3
+snippet_support = true
+verbosity = 2
 
 [[semantic_tokens]]
 token = "comment"
@@ -84,15 +84,12 @@ args = ["--stdio"]
 
 [language.typescript]
 filetypes = ["typescript"]
-roots = ["package.json", "_config.js"]
+roots = ["package.json", "deno.json"]
 command = "typescript-language-server"
 args = ["--stdio"]
 
-# [language.typescript]
-# filetypes = ["typescript", "javascript"]
-# roots = [".git"]
 # command = "deno"
-# args = ["lsp"]
+# args = ["lsp", "-q"]
 # [language.typescript.settings.deno]
 # enable = true
 # lint = true
@@ -117,7 +114,7 @@ args = ["--stdio"]
 [language.html]
 filetypes = ["html"]
 roots = ["package.json"]
-command = "html-languageserver"
+command = "vscode-html-language-server"
 args = ["--stdio"]
 
 [language.ocaml]
@@ -136,15 +133,17 @@ args = ["--stdio"]
 filetypes = ["python"]
 roots = ["requirements.txt", "setup.py", ".git", ".hg", "pyproject.toml"]
 command = "pylsp"
-# command = "jedi-language-server"
-# args = ["--verbose", "--log-file=/home/jerluc/.pylsp.log"]
-offset_encoding = "utf-8"
+# settings_section = "_"
+
+[language.python.settings._]
+# See https://github.com/python-lsp/python-lsp-server#configuration
+# # pylsp.configurationSources = ["flake8"]
 
 [language.c_cpp]
 filetypes = ["c", "cpp"]
 roots = ["compile_commands.json", ".cquery"]
-command = "cquery"
-args = ["--init={\"cacheDirectory\":\"/tmp/cquery\",\"highlight\":{\"enabled\":true}}"]
+command = "clangd"
+# args = ["--init={\"cacheDirectory\":\"/tmp/cquery\",\"highlight\":{\"enabled\":true}}"]
 
 [language.haskell]
 filetypes = ["haskell"]
@@ -174,19 +173,8 @@ filetypes = ["d", "di"]
 roots = [".git", "dub.sdl", "dub.json"]
 command = "dls"
 
-[language.nim]
-filetypes = ["nim"]
-roots = ["*.nimble", ".git"]
-command = "nimlsp"
-
-[language.elm]
-filetypes = ["elm"]
-roots = ["elm.json"]
-command = "elm-language-server"
-args = ["--stdio"]
-
 [language.vue]
-filetypes = ["vue"]
+filetypes = ["vue", "vuejs"]
 roots = ["package.json"]
 command = "vue-language-server"
 args = ["--stdio"]
@@ -195,6 +183,7 @@ settings_section = "vue"
 settings_section = "typescript"
 [language.vue.settings.vue.typescript]
 tsdk = "node_modules/typescript/lib"
+
 
 [language.yaml]
 filetypes = ["yaml"]
