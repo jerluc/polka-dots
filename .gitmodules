@@ -1,0 +1,3 @@
+[submodule "overlays/home/.config/alacritty/colorscheme"]
+	path = overlays/home/.config/alacritty/colorscheme
+	url = https://github.com/eendroroy/alacritty-theme.git
