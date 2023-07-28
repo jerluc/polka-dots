@@ -1,3 +1,33 @@
 [submodule "overlays/home/.config/alacritty/colorscheme"]
 	path = overlays/home/.config/alacritty/colorscheme
 	url = https://github.com/eendroroy/alacritty-theme.git
+[submodule "overlays/home/.config/kak/plugins/plug.kak"]
+	path = overlays/home/.config/kak/plugins/plug.kak
+	url = https://github.com/andreyorst/plug.kak.git
+[submodule "overlays/home/.config/kak/plugins/case.kak"]
+	path = overlays/home/.config/kak/plugins/case.kak
+	url = https://gitlab.com/FlyingWombat/case.kak
+[submodule "overlays/home/.config/kak/plugins/fzf.kak"]
+	path = overlays/home/.config/kak/plugins/fzf.kak
+	url = https://github.com/andreyorst/fzf.kak
+[submodule "overlays/home/.config/kak/plugins/kak-lsp"]
+	path = overlays/home/.config/kak/plugins/kak-lsp
+	url = https://github.com/kak-lsp/kak-lsp
+[submodule "overlays/home/.config/kak/plugins/kakboard"]
+	path = overlays/home/.config/kak/plugins/kakboard
+	url = https://github.com/lePerdu/kakboard
+[submodule "overlays/home/.config/kak/plugins/kakoune-edit-or-dir"]
+	path = overlays/home/.config/kak/plugins/kakoune-edit-or-dir
+	url = https://github.com/TeddyDD/kakoune-edit-or-dir
+[submodule "overlays/home/.config/kak/plugins/kakoune-palette"]
+	path = overlays/home/.config/kak/plugins/kakoune-palette
+	url = https://github.com/Delapouite/kakoune-palette
+[submodule "overlays/home/.config/kak/plugins/kakoune-vue"]
+	path = overlays/home/.config/kak/plugins/kakoune-vue
+	url = https://github.com/ABuffSeagull/kakoune-vue
+[submodule "overlays/home/.config/kak/plugins/smarttab.kak"]
+	path = overlays/home/.config/kak/plugins/smarttab.kak
+	url = https://github.com/andreyorst/smarttab.kak
+[submodule "overlays/home/.config/kak/plugins/powerline.kak"]
+	path = overlays/home/.config/kak/plugins/powerline.kak
+	url = https://github.com/andreyorst/powerline.kak

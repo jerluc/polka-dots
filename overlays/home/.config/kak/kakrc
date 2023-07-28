@@ -153,7 +153,7 @@ set-face global search +bi
 # }
 
 # Powerline
-plug "jdugan6240/powerline.kak" defer powerline %{
+plug "andreyorst/powerline.kak" defer powerline %{
     set-option global powerline_format 'git bufname filetype mode_info line_column position'
     # powerline-theme nord
 } config %{
