@@ -29,7 +29,9 @@ do_update () {
     src="$polka_dir/overlays/home/$home_relative_file"
     dst="$HOME/$home_relative_file"
 
-    cp $dst "$dst.$version.bak"
+    if [[ -e "$dst" ]]; then
+        cp $dst "$dst.$version.bak"
+    fi
     cp $src $dst
     echo "- Updated file: $dst"
 
@@ -57,9 +59,10 @@ for config_dir in $(ls $polka_dir/overlays/home/.config/); do
         # NOTE: For now, only overwrite files
         if [[ -f "$polka_dir/overlays/home/$home_relative_file" ]]; then
             # TODO: Add a way to force create the directory?
-            if [[ -d "$HOME/$home_relative_dir" ]]; then
-                maybe_update $home_relative_file
+            if [[ ! -d "$HOME/$home_relative_dir" ]]; then
+                mkdir "$HOME/$home_relative_dir"
             fi
+            maybe_update $home_relative_file
         fi
     done
 done
