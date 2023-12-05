@@ -21,11 +21,13 @@ brew install --cask sf-symbols
 brew install asciinema
 brew install atlas
 brew install bash
+brew install bat
 brew install binutils
 brew install coreutils
 brew install curl
 brew install editorconfig
 brew install flux
+brew install fzf
 brew install gh
 brew install git
 brew install gnupg
