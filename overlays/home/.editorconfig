@@ -14,7 +14,7 @@ trim_trailing_whitespace = true
 max_line_length = 100
 
 # 2 space indentation
-[*.{js,jsx,ts,tsx,css,sass,scss,html,vue,yml,yaml,jinja2,json,rb,xml,gql,graphql,tf,hcl}]
+[*.{js,mjs,jsx,ts,mts,tsx,css,sass,scss,html,vue,yml,yaml,jinja2,json,rb,xml,gql,graphql,tf,hcl}]
 indent_style = space
 indent_size = 2
 
