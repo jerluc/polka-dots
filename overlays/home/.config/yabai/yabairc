@@ -59,13 +59,14 @@ yabai -m config \
 
 # Exclude problematic apps from being managed:
 yabai -m rule --add app="^(Notes|Numbers|Pages|Reminders|Calendar|Weather|Preview|Font Book|System Information|Finder|Calculator|Software Update|Dictionary|VLC|System Preferences|System Settings|zoom.us|Photo Booth|Archive Utility|Python|LibreOffice|App Store|Steam|QuickTime Player|Activity Monitor)$" manage=off
-yabai -m rule --add app="^(Steam|Steam Helper|OBS Studio|Live|Midinous|Raycast|Meld|MacDown|1Password|VCV Rack 2 Free|8BitDo Firmware Updater|Microsoft Excel)$" manage=off
+yabai -m rule --add app="^(Steam|Steam Helper|OBS Studio|Live|Midinous|Raycast|Meld|MacDown|1Password|VCV Rack 2 Free|8BitDo Firmware Updater|Microsoft Excel|Godot)$" manage=off
 yabai -m rule --add label="Safari" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
 yabai -m rule --add label="Select file to save to" app="^Inkscape$" title="Select file to save to" manage=off
 
+# TODO: Revisit these later, but currently this is ass on multi-display
 # Auto-space rules
-yabai -m rule --add app="^Slack$" space=^3
-yabai -m rule --add app="^Telegram$" space=^4
+# yabai -m rule --add app="^Slack$" space=^3
+# yabai -m rule --add app="^Telegram$" space=^4
 
 # Special exception for Slack screensharing
 yabai -m rule --add app=^Slack$ subrole!=AXStandardWindow border=off
