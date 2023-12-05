@@ -28,6 +28,9 @@ plug "https://gitlab.com/FlyingWombat/case.kak" %{
     map global normal <a-c> ': enter-user-mode case<ret>'
 }
 
+# DAP
+plug "jdugan6240/kak-debug"
+
 # Tabs
 plug "andreyorst/smarttab.kak"
 
@@ -220,11 +223,6 @@ plug "kak-lsp/kak-lsp" do %{
     define-command ee -docstring 'go to current error/warning from lsp' %{ lsp-find-error --include-warnings; lsp-find-error --previous --include-warnings }
     define-command lsp-restart -docstring 'restart lsp server' %{ lsp-stop; lsp-start }
     declare-option -hidden str modeline_progress ""
-    define-command -hidden -params 4 -override lsp-handle-progress %{
-        set global modeline_progress %sh{
-            echo $1${2:+": $2"}${3:+" $3%"}${4:+" ✓"}
-        }
-    }
 
     hook global WinSetOption filetype=(rust|ruby|python|go|javascript|typescript|c|cpp|html|css|scss|vue|graphql) %{
         map window normal <c-r> ': lsp-rename-prompt<ret>'
