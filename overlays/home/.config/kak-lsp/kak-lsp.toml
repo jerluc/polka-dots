@@ -185,7 +185,7 @@ command = "dls"
 [language.vue]
 filetypes = ["vue", "vuejs"]
 roots = ["package.json"]
-command = "vls"
+command = "vue-language-server"
 args = ["--stdio"]
 settings_section = "vue"
 [language.vue.settings.vue]
