@@ -12,12 +12,17 @@ maybe_update () {
     dst="$HOME/$home_relative_file"
 
     if [[ -e "$dst" ]]; then
-        read -p "Overwrite local file '$dst'? [Y/n]: " -n 1 -r
-        echo    # (optional) move to a new line
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            do_update $home_relative_file
+        # TODO: This diff needs to take "maybe_patch" into account somehow
+        if diff --color=always $dst $src; then
+            echo "$dst up to date"
         else
-            echo "Skipping update for: $dst"
+            read -p "Overwrite local file '$dst'? [Y/n]: " -n 1 -r
+            echo    # (optional) move to a new line
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                do_update $home_relative_file
+            else
+                echo "Skipping update for: $dst"
+            fi
         fi
     else
         do_update $home_relative_file
