@@ -160,6 +160,14 @@ roots = ["Setup.hs", "stack.yaml", "*.cabal"]
 command = "hie"
 args = ["--lsp"]
 
+
+[language.gdscript]
+filetypes = ["gd", "gdscript"]
+roots = [".import", "project.godot"]
+command = "nc"
+args = ["localhost", "6005"]
+
+
 [language.go]
 filetypes = ["go"]
 roots = ["Gopkg.toml", "go.mod", ".git", ".hg"]

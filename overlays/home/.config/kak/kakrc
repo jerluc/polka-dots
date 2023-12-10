@@ -224,9 +224,9 @@ plug "kak-lsp/kak-lsp" do %{
     define-command lsp-restart -docstring 'restart lsp server' %{ lsp-stop; lsp-start }
     declare-option -hidden str modeline_progress ""
 
-    hook global WinSetOption filetype=(rust|ruby|python|go|javascript|typescript|c|cpp|html|css|scss|vue|graphql) %{
+    hook global WinSetOption filetype=(rust|ruby|python|gdscript|go|javascript|typescript|c|cpp|html|css|scss|vue|graphql) %{
         map window normal <c-r> ': lsp-rename-prompt<ret>'
-        # set-option window lsp_auto_highlight_references true
+        set-option window lsp_auto_highlight_references true
         set-option window lsp_hover_anchor true
         set-option global lsp_show_hover_format 'printf %s "${lsp_info}"'
         map window normal <\> ': lsp-hover<ret>'
@@ -247,6 +247,10 @@ plug "ABuffSeagull/kakoune-vue"
 # Typescript support
 # Currently this is broken: https://github.com/atomrc/kakoune-typescript/issues/3
 # plug "atomrc/kakoune-typescript"
+
+hook global BufCreate .*\.gd %{
+    set-option buffer filetype gdscript
+}
 
 # Meh
 hook global BufCreate .*\.hcl %{
