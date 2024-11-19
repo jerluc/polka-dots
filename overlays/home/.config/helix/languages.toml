@@ -1,0 +1,45 @@
+[[language]]
+name = "python"
+auto-format = true
+language-servers = [ "pyright", "ruff" ]
+formatter = { command = "black" }
+
+[language-server.pyright.config.python.analysis]
+typeCheckingMode = "basic"
+
+[language-server.ruff]
+command = "ruff"
+args = [ "server" ]
+
+[[language]]
+name = "vue"
+auto-format = true
+formatter = { command = "prettier", args = [ "--parser", "vue" ] }
+language-servers = [ "typescript-language-server", "tailwindcss-ls" ]
+
+[[language-server.typescript-language-server.config.plugins]]
+name = "@vue/typescript-plugin"
+# Meh
+location = "/home/jerluc/.nvm-current/lib/node_modules/@vue/language-server/"
+languages = [ "vue", "typescript" ]
+
+[[language]]
+name = "html"
+language-servers = [ "vscode-html-language-server", "tailwindcss-ls" ]
+
+[[language]]
+name = "css"
+language-servers = [ "vscode-css-language-server", "tailwindcss-ls" ]
+
+[[language]]
+name = "javascript"
+auto-format = true
+formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
+language-servers = [ "typescript-language-server", "tailwindcss-ls" ]
+
+[[language]]
+name = "typescript"
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+language-servers = [ "typescript-language-server", "tailwindcss-ls" ]
+

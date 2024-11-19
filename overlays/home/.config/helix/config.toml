@@ -1,0 +1,17 @@
+theme = "hex_steel"
+
+[editor]
+cursorline = true
+cursorcolumn = true
+popup-border = "all"
+auto-pairs = true  # Maybe not?
+
+[editor.indent-guides]
+render = true
+character = "┊"
+# skip-levels = 1
+
+[keys.normal]
+C-s = ":w"
+C-q = ":quit"
+"\\" = "hover"

@@ -19,6 +19,6 @@ indent_style = space
 indent_size = 2
 
 # Tab indentation (no size specified)
-[{Makefile,*.go}]
+[{Makefile,*.go,*.gd}]
 indent_style = tab
 indent_size = 4
