@@ -1,7 +1,9 @@
 inherits = "kanagawa-dragon"
 
-"ui.gutter" = { bg = "dragonBlack3" }
-"ui.linenr" = { bg = "dragonBlack3" }
+"ui.background" = { bg = "transparent" }
+
+"ui.gutter" = { bg = "transparent" }
+"ui.linenr" = { bg = "transparent" }
 
 "ui.gutter.selected" = { bg = "dragonBlack4" }
 "ui.linenr.selected" = { fg = "roninYellow", bg = "dragonBlack4", modifiers = ["bold"] }

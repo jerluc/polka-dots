@@ -2,14 +2,15 @@
 name = "python"
 auto-format = true
 language-servers = [ "pyright", "ruff" ]
-formatter = { command = "black" }
+# Use the project's version of black for now!
+formatter = { command = "black", args = ["-", "--quiet"] }
 
 [language-server.pyright.config.python.analysis]
 typeCheckingMode = "basic"
 
 [language-server.ruff]
-command = "ruff"
-args = [ "server" ]
+command = "uvx"
+args = [ "ruff", "server" ]
 
 [[language]]
 name = "vue"
